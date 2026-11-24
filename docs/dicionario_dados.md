@@ -8,10 +8,10 @@ Cada linha representa um aluno em um semestre e currículo. A mesma pessoa pode 
 | `ANOSEMESTRE` | Semestre ao qual a linha se refere | categórica (período letivo) | tempo | Formato `AAAA/S`; legenda indica 2009/1 a 2026/1. |
 | `HANDLEALUNOANOSEMESTRE` | Código interno da matrícula do aluno no semestre | identificador | identificação | 81,7% preenchido; vazio quando não há registro de matrícula. |
 | `HANDLEALUNO` | Código interno do aluno, usado para juntar seus registros | identificador | identificação | Não exibir valores nem calcular categorias/contagens distintas. |
-| `HANDLEALUNOCURRICULO` | Código interno do vínculo do aluno com o currículo | identificador | identificação | Sem interpretação quantitativa. |
-| `HANDLECURRICULO` | Código interno do currículo | identificador | identificação | Sem interpretação quantitativa. |
-| `PERIODO` | Período curricular do aluno no semestre | numérica (ordinal) | curso/vínculo | Legenda indica 0 a 10; 0 ocorre quase somente no código de aluno especial; 75,5% preenchido. |
-| `SIGLACURSO` | Código do curso do currículo | categórica | curso/vínculo | 12 códigos segundo a legenda; categorias agregadas aparecem no notebook. |
+| `HANDLEALUNOCURRICULO` | Código interno do vínculo do aluno com o currículo | identificador | identificação | Identifica o vínculo; junto com aluno e semestre, compõe a chave única observada. |
+| `HANDLECURRICULO` | Código interno do currículo | identificador | identificação | Identifica o currículo, não o vínculo individual do aluno; um aluno pode ter mais de um vínculo com o mesmo currículo. |
+| `PERIODO` | Período curricular do aluno no semestre | numérica (ordinal) | curso/vínculo | Legenda indica 0 a 10; 0 é usado principalmente para alunos especiais sem período regular em uma grade padrão; 75,5% preenchido. |
+| `SIGLACURSO` | Código do curso do currículo | categórica | curso/vínculo | Siglas: GAE, GEA, GEB, GEC, GEE, GEL, GEP, GES, GET, TAI, TGT e TRC; TAI, TGT e TRC são cursos tecnológicos. |
 | `TURNO` | Turno do currículo | categórica | curso/vínculo | Legenda cita Integral e Noturno. |
 | `CRENOSEMESTRE` | Coeficiente de rendimento escolar no semestre | numérica | acadêmica | Faixa indicada 0–100; 72,2% preenchido. |
 | `CREATESEMESTRE` | CRE acumulado até o semestre | numérica | acadêmica | Faixa indicada 0–100; 75,9% preenchido. |
@@ -75,7 +75,7 @@ Cada linha representa um aluno em um semestre e currículo. A mesma pessoa pode 
 
 - Os dois arquivos locais são da versão v7. Legenda e CSV têm 66 colunas e os nomes estão alinhados.
 - `TEVETRANSAFASTAMENTO` e `DATATRANSAFASTAMENTO` têm a mesma grafia no CSV e na legenda v7. A grafia antiga `TEVETRASAFASTAMENTO` não aparece nos arquivos atuais.
-- A legenda informa 12 códigos de curso, sem enumerar as siglas. `GAE` aparece em `SIGLACURSO` no CSV, mas não está documentada nominalmente na legenda.
+- A legenda informa 12 códigos de curso sem enumerar as siglas. Conforme esclarecimento recebido, são GAE, GEA, GEB, GEC, GEE, GEL, GEP, GES, GET, TAI, TGT e TRC; TAI, TGT e TRC são cursos tecnológicos. `GAE` identifica aluno especial, como aluno de intercâmbio, com grade própria.
 - `VALORMENSALIDADE`, `MATRICULA` e `DATANASCIMENTO` não aparecem no CSV nem na legenda; a legenda informa que dados financeiros e identificadores pessoais não fazem parte da extração.
 - Este checkout não contém `notebooks/00_carga_base.ipynb`; não foi possível validar esse notebook ou comparar seus totais com a issue #2.
 
