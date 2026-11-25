@@ -17,7 +17,7 @@ Conferência executada em `notebooks/01_conferencia_legenda.ipynb` sobre os arqu
 
 ### Siglas de curso e `PERIODO = 0`
 
-As 12 siglas de curso são `GAE`, `GEA`, `GEB`, `GEC`, `GEE`, `GEL`, `GEP`, `GES`, `GET`, `TAI`, `TGT` e `TRC`; `TAI`, `TGT` e `TRC` são cursos tecnológicos. `GAE` identifica aluno especial, como aluno de intercâmbio, que segue uma grade própria e não um curso padrão. Por isso, alunos especiais não têm um período regular associado, e `PERIODO = 0` é usado principalmente para esses casos. No CSV, 72,7% das linhas com `PERIODO = 0` correspondem a GAE; o valor zero não é exclusivo desse código. As contagens pequenas por curso são agrupadas ou suprimidas no notebook.
+As 12 siglas de curso são `GAE`, `GEA`, `GEB`, `GEC`, `GEE`, `GEL`, `GEP`, `GES`, `GET`, `TAI`, `TGT` e `TRC`; `TAI`, `TGT` e `TRC` são cursos tecnológicos. `GAE` identifica aluno especial, como aluno de intercâmbio, que segue uma grade própria e não um curso padrão. Por isso, alunos especiais não têm um período regular associado, e `PERIODO = 0` é usado principalmente para esses casos. A maioria das linhas com `PERIODO = 0` corresponde a GAE; o valor zero não é exclusivo desse código. As contagens pequenas por curso são agrupadas ou suprimidas no notebook.
 
 ### Chave de unicidade da linha
 
@@ -33,6 +33,6 @@ A chave única é aluno + semestre + `HANDLEALUNOCURRICULO`: esse identificador 
 
 ## Limites desta conferência
 
-O notebook `00_carga_base.ipynb` foi executado na branch `issue-2-carga-base`; os totais exibidos nele conferem com a referência v7 embutida no próprio notebook. O texto do PR da issue #2 não foi confirmado diretamente nesta conferência.
+O notebook `00_carga_base.ipynb` foi executado na branch `issue-2-carga-base`. Seus totais de referência — 59.059 linhas, 66 colunas, 7.615 alunos, 44.417 linhas `ACADEMICA` e 14.642 `OCORRENCIA` — coincidem com a tabela do PR #16; esse critério de comparação está atendido.
 
 Este registro incorpora os esclarecimentos recebidos sobre as siglas de curso, `GAE`, `PERIODO = 0` e a chave do vínculo.
