@@ -100,6 +100,20 @@ O significado de cada coluna está na `Legenda.md`, que acompanha a base.
 - **O que a base não tem, e por quê:** dados financeiros e socioeconômicos, porque o uso não foi autorizado, e identificadores pessoais (matrícula, data de nascimento), que não fazem parte da extração. As colunas `HANDLE*` são códigos internos, usados só para juntar os registros de um mesmo aluno.
 - **Adequação às perguntas:** a base permite responder P1 a P6 com indicadores acadêmicos, de vínculo, sexo e ocorrências. Ela **não** permite avaliar o papel de fatores financeiros, socioeconômicos, familiares ou de saúde, nem o motivo declarado da saída.
 
+### Definições usadas nas análises
+
+Todas as análises usam as mesmas regras, implementadas em `src/eventos.py` e conferidas em `notebooks/03_evento_saida.ipynb` (issue #6).
+
+- **Recorte:** só a graduação. O código de aluno especial (`GAE`), que fica fora da graduação regular, é excluído.
+- **Evento de saída:** semestre em que o aluno tem registro de **desistência, abandono, cancelamento ou desligamento**. Não é o mesmo que evasão definitiva: parte dos alunos volta a estudar depois.
+- **Não são evento de saída:** trancamento, transferência ou afastamento, afastamento sem ocorrência, prazo esgotado, rematrícula, falecimento, mudança de curso, migração de currículo, diplomação e reingresso.
+- **Saída por troca:** quando o aluno muda de curso ou de currículo, o vínculo antigo pode receber um registro de saída no mesmo semestre em que ele continua estudando no vínculo novo. Esses registros **não** contam como evento de saída, desde que o aluno curse algum semestre depois. Se ele não cursa mais nenhum semestre, a troca não se concretizou e o registro conta como saída. No último semestre da base, em que não dá para ver o que vem depois, vale só o registro da troca.
+- **Primeira saída:** o primeiro semestre do aluno com evento de saída.
+- **Visão por aluno:** uma linha por aluno, com curso, turno e ingresso do **primeiro** semestre dele na base. Esses atributos mudam para quem troca de curso, por isso vale sempre o primeiro.
+- **Visão aluno-semestre:** uma linha por aluno em cada semestre. Quando o aluno tem mais de uma linha no semestre (troca de curso ou de currículo), curso, turno e indicadores vêm da linha em que ele cursou o semestre.
+- **Rótulo da modelagem:** "a primeira saída acontece no semestre seguinte" (sim/não), calculado para os semestres anteriores à primeira saída. O último semestre da base (2026/1) fica sem rótulo, porque o semestre seguinte não foi observado.
+- **Premissa do rótulo:** dentro do período da base, não ter registro de saída no semestre seguinte é tratado como "não houve saída". Quase todos os alunos que não aparecem no semestre seguinte se diplomaram, voltam depois ou têm transferência/afastamento registrado, que não conta como saída (notebook 03, seção 8).
+
 ### Como obter
 
 A base tem **acesso restrito** e **não vai para o GitHub**. Ela fica numa pasta compartilhada só com a equipe, por convite. Para ter acesso, peça à Karolina.
