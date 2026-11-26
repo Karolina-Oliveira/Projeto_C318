@@ -16,10 +16,14 @@ TEVEABANDONO, TEVECANCELAMENTO ou TEVEDESLIGAMENTO igual a 1. São os mesmos
 quatro tipos que alimentam DATAPRIMEIRASAIDA.
 
 Saída por troca: o evento acontece num semestre em que o aluno continua na
-instituição por outro caminho, ou seja, tem mudança de curso ou migração de
-currículo registrada no semestre, ou tem linha ACADEMICA em outro vínculo
-(HANDLEALUNOCURRICULO) no mesmo semestre. Nesses casos o registro de saída
-encerra o vínculo antigo e não é tratado como evento de saída.
+instituição por outro caminho. As duas condições valem juntas:
+- troca no semestre: mudança de curso ou migração de currículo registrada, ou
+  linha ACADEMICA em outro vínculo (HANDLEALUNOCURRICULO) no mesmo semestre;
+- continuidade: o aluno cursa (linha ACADEMICA) algum semestre posterior.
+Nesses casos o registro de saída encerra o vínculo antigo e não é tratado como
+evento de saída. Se há troca, mas o aluno não cursa mais nenhum semestre, a
+troca não se concretizou e o evento conta como saída. No último semestre da
+base não dá para observar a continuidade; ali vale só a primeira condição.
 
 Evento de saída (aluno-semestre): há evento de saída em alguma linha do aluno
 no semestre e ele não é saída por troca.
@@ -99,8 +103,10 @@ def consolidar_aluno_semestre(df: pd.DataFrame) -> pd.DataFrame:
     - N_LINHAS: quantas linhas a base tinha para o aluno no semestre;
     - TEM_ACADEMICA: 1 se alguma linha é ACADEMICA (o aluno cursou o semestre);
     - EVENTO_SAIDA_BRUTO: 1 se alguma linha tem evento de saída;
-    - SAIDA_POR_TROCA: 1 se o evento acontece junto com uma troca de curso ou
-      currículo (ver o docstring do módulo);
+    - TROCA_NO_SEMESTRE: 1 se há mudança de curso, migração de currículo ou
+      linha ACADEMICA em outro vínculo que não o do evento;
+    - SAIDA_POR_TROCA: 1 se o evento acontece junto com uma troca e o aluno
+      cursa algum semestre depois (ver o docstring do módulo);
     - EVENTO_SAIDA: EVENTO_SAIDA_BRUTO sem as saídas por troca;
     - TIPO_SAIDA: tipo do evento de saída, quando houver.
     """
@@ -135,10 +141,19 @@ def consolidar_aluno_semestre(df: pd.DataFrame) -> pd.DataFrame:
     )
     principal["_outro_vinculo"] = academica_em_outro_vinculo.reindex(principal.index, fill_value=False)
     principal["_troca_registrada"] = principal[list(FLAGS_TROCA)].max(axis=1) == 1
+    principal["TROCA_NO_SEMESTRE"] = (principal["_outro_vinculo"] | principal["_troca_registrada"]).astype(int)
+
+    # Continuidade: o aluno cursa algum semestre depois deste. No último semestre
+    # da base ela não pode ser observada e é assumida.
+    semestre = pd.Series(principal.index.get_level_values("ANOSEMESTRE_ORD"), index=principal.index)
+    ultimo_cursado = df.loc[df["ORIGEMREGISTRO"] == "ACADEMICA"].groupby("HANDLEALUNO")["ANOSEMESTRE_ORD"].max()
+    ultimo_cursado = pd.Series(
+        principal.index.get_level_values("HANDLEALUNO").map(ultimo_cursado), index=principal.index
+    )
+    continuidade = (ultimo_cursado > semestre) | (semestre == df["ANOSEMESTRE_ORD"].max())
 
     principal["SAIDA_POR_TROCA"] = (
-        (principal["EVENTO_SAIDA_BRUTO"] == 1)
-        & (principal["_outro_vinculo"] | principal["_troca_registrada"])
+        (principal["EVENTO_SAIDA_BRUTO"] == 1) & (principal["TROCA_NO_SEMESTRE"] == 1) & continuidade
     ).astype(int)
     principal["EVENTO_SAIDA"] = (
         (principal["EVENTO_SAIDA_BRUTO"] == 1) & (principal["SAIDA_POR_TROCA"] == 0)
@@ -176,8 +191,14 @@ def marcar_saida_semestre_seguinte(aluno_semestre: pd.DataFrame) -> pd.DataFrame
     - ANTES_PRIMEIRA_SAIDA: 1 se o semestre é anterior à primeira saída, ou se o
       aluno nunca teve saída;
     - SAIDA_SEMESTRE_SEGUINTE: 1 se a primeira saída acontece no semestre
-      calendário seguinte (ANOSEMESTRE_ORD + 1), 0 se não; vazio nos semestres
-      da primeira saída em diante, que ficam fora da modelagem.
+      calendário seguinte (ANOSEMESTRE_ORD + 1), 0 se não. Fica vazio nos
+      semestres da primeira saída em diante e no último semestre da base,
+      cujo semestre seguinte não foi observado; essas linhas ficam fora da
+      modelagem.
+
+    Premissa: dentro do período da base, a ausência de registro de saída no
+    semestre seguinte é tratada como "não houve saída". O notebook 03 mostra o
+    que acontece com os alunos que não aparecem no semestre seguinte.
     """
     resultado = aluno_semestre.drop(
         columns=["PRIMEIRA_SAIDA_ORD", "ANTES_PRIMEIRA_SAIDA", "SAIDA_SEMESTRE_SEGUINTE"], errors="ignore"
@@ -190,7 +211,8 @@ def marcar_saida_semestre_seguinte(aluno_semestre: pd.DataFrame) -> pd.DataFrame
     antes = antes.fillna(False).astype(bool)
     resultado["ANTES_PRIMEIRA_SAIDA"] = antes.astype(int)
     seguinte = (resultado["PRIMEIRA_SAIDA_ORD"] == resultado["ANOSEMESTRE_ORD"] + 1).fillna(False)
-    resultado["SAIDA_SEMESTRE_SEGUINTE"] = seguinte.astype("Int64").where(antes)
+    observado = resultado["ANOSEMESTRE_ORD"] < resultado["ANOSEMESTRE_ORD"].max()
+    resultado["SAIDA_SEMESTRE_SEGUINTE"] = seguinte.astype("Int64").where(antes & observado)
     return resultado
 
 
