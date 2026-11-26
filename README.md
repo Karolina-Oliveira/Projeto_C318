@@ -183,6 +183,23 @@ As dúvidas levadas às mentorias com o professor e as decisões que mudam o pro
 
 *Preenchido na issue #14: uma subseção por pergunta de negócio (P1 a P6), com a figura principal e os números das saídas dos notebooks.*
 
+### P4 – Indicadores no semestre anterior à primeira saída
+
+Fonte: `notebooks/06_semestre_anterior_saida.ipynb` (issue #9).
+
+Comparamos o **último semestre cursado antes da primeira saída** com os semestres de **colegas do mesmo semestre e curso** que ainda não tinham tido saída naquele momento. A comparação vale para os 1.850 alunos com saída que cursaram pelo menos um semestre antes de sair (54,0% dos alunos com saída); os demais saíram já no primeiro semestre em que aparecem na base.
+
+- **CRE do semestre:** mediana 21,3 antes da saída, contra 63,0 entre os colegas. Comparado com um colega, o aluno que depois sai tem 86% de chance de ter CRE menor.
+- **CRE acumulado:** mediana 31,7 contra 60,8 (84% de chance de ser menor).
+- **Frequência:** mediana 85,0% contra 93,9% (76% de chance de ser menor).
+- **Disciplinas com mais de 25% de faltas:** pelo menos uma em 43,4% dos semestres antes da saída, contra 10,4% entre os colegas.
+- **Reprovações:** pelo menos uma em 77,9% dos semestres antes da saída, contra 47,4%.
+- **Retiradas de disciplina:** diferença pequena, 24,0% contra 17,0%.
+
+O semestre que antecede a saída é marcado por **CRE baixo, frequência menor e mais reprovações** do que o dos colegas. Isso é associação, não causa: o semestre anterior pode já refletir o afastamento do aluno.
+
+![Indicadores no semestre anterior à primeira saída](reports/figures/06_indicadores_semestre_anterior.png)
+
 ## Conclusões
 
 *Preenchido na issue #14: o que a análise mostra para a instituição (negócio) e o que mostra tecnicamente (dados e modelos), com as limitações do estudo.*
